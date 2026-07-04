@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mending Worlds - Secure Portal</title>
+    <style>
+        :root {
+            --primary: #00ff66; /* Cyberpunk/Underground Green */
+            --bg-dark: #0a0a0c;
+            --panel-bg: #121216;
+            --text: #ffffff;
+            --error: #ff3333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bg-dark);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* --- GATEWAY GATE CONTAINER --- */
+        .portal-wrapper {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- PASSWORD WALL --- */
+        .auth-screen {
+            position: absolute;
+            z-index: 10;
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            background: var(--panel-bg);
+            border: 1px solid rgba(0, 255, 102, 0.2);
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 20px rgba(0, 255, 102, 0.05);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Class added via JS when authorized */
+        .auth-screen.fade-out {
+            opacity: 0;
+            transform: scale(0.8) translateY(-30px);
+            pointer-events: none;
+        }
+
+        .org-header h1 {
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            color: var(--primary);
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
+        }
+
+        .org-header p {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 35px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 1.2rem;
+            letter-spacing: 5px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 255, 102, 0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-weight: bold;
+            letter-spacing: 2px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary);
+            color: var(--bg-dark);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .error-msg {
+            color: var(--error);
+            font-size: 0.85rem;
+            margin-top: 15px;
+            min-height: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        /* --- STREAMING INTERFACE --- */
+        .stream-interface {
+            width: 100%;
+            height: 100%;
+            max-width: 1200px;
+            max-height: 675px;
+            padding: 20px;
+            opacity: 0;
+            transform: scale(1.1);
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1) 0.3s; /* Delays slightly for smooth flow */
+            display: flex;
+            flex-direction: column;
+            pointer-events: none;
+        }
+
+        /* Class added via JS when authorized */
+        .stream-interface.fade-in {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 15px;
+        }
+
+        .stream-title {
+            color: #fff;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        .badge {
+            background: rgba(0, 255, 102, 0.1);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            border: 1px solid rgba(0, 255, 102, 0.3);
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            flex-grow: 1;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.8);
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="portal-wrapper">
+        
+        <!-- STEP 1: UNDERGROUND AUTH WALL -->
+        <div class="auth-screen" id="authScreen">
+            <div class="org-header">
+                <h1>MENDING WORLDS</h1>
+                <p>// Underground Organisation Network //</p>
+            </div>
+            <div class="input-group">
+                <input type="password" id="passwordInput" placeholder="ENTER ACCESS KEY" maxlength="8">
+            </div>
+            <button class="submit-btn" onclick="verifyAccess()">Decrypt Stream</button>
+            <div class="error-msg" id="errorMsg">ACCESS DENIED: INVALID KEY</div>
+        </div>
+
+        <!-- STEP 2: STREAMING INTERFACE -->
+        <div class="stream-interface" id="streamInterface">
+            <div class="player-header">
+                <div class="stream-title">📁 SECRETS_DIR / kapil-show-s04e14.mp4</div>
+                <div class="badge">SECURE STREAM ACTIVE</div>
+            </div>
+            <div class="video-wrapper">
+                <video id="secureVideo" controls preload="auto">
+                    <source src="https://pub-85fc1bc3fd0b46b5b145fa9cdbe3eb23.r2.dev/kapil-show-s04e14.mp4" type="video/mp4">
+                    Secure feed configuration failure.
+                </video>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Trigger verification on 'Enter' key press
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verifyAccess();
+            }
+        });
+
+        function verifyAccess() {
+            const input = document.getElementById('passwordInput').value;
+            const authScreen = document.getElementById('authScreen');
+            const streamInterface = document.getElementById('streamInterface');
+            const errorMsg = document.getElementById('errorMsg');
+            const video = document.getElementById('secureVideo');
+
+            const secureKey = "753159";
+
+            if (input === secureKey) {
+                // Hide errors if any
+                errorMsg.style.opacity = "0";
+                
+                // Trigger smooth CSS exit transition for password box
+                authScreen.classList.add('fade-out');
+                
+                // Trigger smooth CSS entry transition for video layout
+                streamInterface.classList.add('fade-in');
+                
+                // Instantly queue and play video alongside animation
+                video.play();
+            } else {
+                // Denied sequence
+                errorMsg.style.opacity = "1";
+                document.getElementById('passwordInput').value = "";
+                document.getElementById('passwordInput').focus();
+            }
+        }
+    </script>
+</body>
+</html>
