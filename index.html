@@ -6,7 +6,7 @@
     <title>Mending Worlds - Secure Portal</title>
     <style>
         :root {
-            --primary: #00ff66; /* Cyberpunk/Underground Green */
+            --primary: #00ff66;
             --bg-dark: #0a0a0c;
             --panel-bg: #121216;
             --text: #ffffff;
@@ -30,7 +30,6 @@
             overflow: hidden;
         }
 
-        /* --- GATEWAY GATE CONTAINER --- */
         .portal-wrapper {
             position: relative;
             width: 100vw;
@@ -40,7 +39,6 @@
             align-items: center;
         }
 
-        /* --- PASSWORD WALL --- */
         .auth-screen {
             position: absolute;
             z-index: 10;
@@ -57,7 +55,6 @@
             transform: scale(1);
         }
 
-        /* Class added via JS when authorized */
         .auth-screen.fade-out {
             opacity: 0;
             transform: scale(0.8) translateY(-30px);
@@ -96,7 +93,7 @@
             letter-spacing: 5px;
             text-align: center;
             outline: none;
-            transition: border-color 0.3s;
+            transition: border-color 0.3s ease;
         }
 
         .input-group input:focus {
@@ -114,7 +111,7 @@
             letter-spacing: 2px;
             border-radius: 6px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             text-transform: uppercase;
         }
 
@@ -130,10 +127,9 @@
             margin-top: 15px;
             min-height: 20px;
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: opacity 0.3s ease;
         }
 
-        /* --- STREAMING INTERFACE --- */
         .stream-interface {
             width: 100%;
             height: 100%;
@@ -142,13 +138,13 @@
             padding: 20px;
             opacity: 0;
             transform: scale(1.1);
-            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1) 0.3s;
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+            transition-delay: 0.3s;
             display: flex;
             flex-direction: column;
             pointer-events: none;
         }
 
-        /* Class added via JS when authorized */
         .stream-interface.fade-in {
             opacity: 1;
             transform: scale(1);
@@ -200,7 +196,6 @@
 
     <div class="portal-wrapper">
         
-        <!-- STEP 1: UNDERGROUND AUTH WALL -->
         <div class="auth-screen" id="authScreen">
             <div class="org-header">
                 <h1>MENDING WORLDS</h1>
@@ -213,7 +208,6 @@
             <div class="error-msg" id="errorMsg">ACCESS DENIED: INVALID KEY</div>
         </div>
 
-        <!-- STEP 2: STREAMING INTERFACE -->
         <div class="stream-interface" id="streamInterface">
             <div class="player-header">
                 <div class="stream-title">📁 SECRETS_DIR / kapil-show-s04e14.mp4</div>
@@ -230,7 +224,6 @@
     </div>
 
     <script>
-        // Trigger verification on 'Enter' key press
         document.getElementById('passwordInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 verifyAccess();
@@ -243,23 +236,14 @@
             const streamInterface = document.getElementById('streamInterface');
             const errorMsg = document.getElementById('errorMsg');
             const video = document.getElementById('secureVideo');
-
             const secureKey = "753159";
 
             if (input === secureKey) {
-                // Hide errors if any
                 errorMsg.style.opacity = "0";
-                
-                // Trigger smooth CSS exit transition for password box
                 authScreen.classList.add('fade-out');
-                
-                // Trigger smooth CSS entry transition for video layout
                 streamInterface.classList.add('fade-in');
-                
-                // Instantly queue and play video alongside animation
                 video.play();
             } else {
-                // Denied sequence
                 errorMsg.style.opacity = "1";
                 document.getElementById('passwordInput').value = "";
                 document.getElementById('passwordInput').focus();
